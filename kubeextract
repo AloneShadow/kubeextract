@@ -45,6 +45,6 @@ for namespace in namespaces:
         if line and 'default-token-' not in line[0]:
             if flag: print ('-'*120)
             else: flag = True
-            print ('\t', 'name:','\x1b[1;32;40m', line[0], '\x1b[0m','type:','\x1b[1;32;40m', line[1], '\x1b[0m', 'count:', '\x1b[1;32;40m', line[2], '\x1b[0m')
+            print ('\t', 'secret:','\x1b[1;32;40m', line[0], '\x1b[0m','type:','\x1b[1;32;40m', line[1], '\x1b[0m', 'count:', '\x1b[1;32;40m', line[2], '\x1b[0m')
             get_secrets(namespace, line[0])
     print('='*150)
