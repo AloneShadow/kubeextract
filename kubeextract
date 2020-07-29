@@ -11,7 +11,7 @@ namespaces = []
 def get_secrets(namespace, secret):
     """ Extract a value from the given secret """
     kube_secrets = subprocess.check_output("kubectl get secret -n "+namespace+" -o yaml "+secret, shell=True)
-    kube_secrets_data = yaml.load(kube_secrets)["data"]
+    kube_secrets_data = yaml.load(kube_secrets, Loader=yaml.FullLoader)["data"]
     for k,v in kube_secrets_data.items():
         decoded_v = base64.b64decode(v)
         try:
@@ -22,7 +22,7 @@ def get_secrets(namespace, secret):
 
 def get_namespaces():
     """ Get a list of all available namespaces """
-    kube_namespaces = subprocess.check_output("kubectl get namespaces", shell=True).decode().split('\n')[1:]
+    kube_namespaces = subprocess.check_output("kubectl get namespaces --no-headers", shell=True).decode().split('\n')
     for i in range (0, len(kube_namespaces)):
       if kube_namespaces[i]:
         namespaces.append(kube_namespaces[i].split()[0])
@@ -38,11 +38,11 @@ else:
 
 for namespace in namespaces:
     print ('\x1b[1;32;40m*',namespace,': \x1b[0m')
-    kube_secrets = subprocess.check_output("kubectl get secret -n "+namespace, shell=True).decode().split('\n')[1:]
+    kube_secrets = subprocess.check_output("kubectl get secret --no-headers -n "+namespace, shell=True).decode().split('\n')
     flag = False
     for line in kube_secrets:
         line = line.split()[:-1]
-        if line and 'default-token-' not in line[0]:
+        if line and 'default-token-' not in line[0] and 'sh.helm.release.' not in line[0]:
             if flag: print ('-'*120)
             else: flag = True
             print ('\t', 'secret:','\x1b[1;32;40m', line[0], '\x1b[0m','type:','\x1b[1;32;40m', line[1], '\x1b[0m', 'count:', '\x1b[1;32;40m', line[2], '\x1b[0m')
